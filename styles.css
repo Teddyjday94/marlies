@@ -1110,3 +1110,180 @@ body {
     padding-inline: 22px;
   }
 }
+
+/* marlies-motion-v1: restrained restaurant motion, progressive enhancement only */
+:root {
+  --motion-ease: cubic-bezier(.22, .61, .36, 1);
+  --motion-soft: cubic-bezier(.16, 1, .3, 1);
+  --hero-shift: 0px;
+}
+
+.site-header {
+  transition: background-color 320ms ease, box-shadow 320ms ease, border-color 320ms ease;
+}
+.site-header.is-scrolled {
+  background: rgba(245,240,230,.985);
+  border-bottom-color: rgba(83,98,81,.3);
+  box-shadow: 0 9px 28px rgba(35,31,25,.09);
+}
+
+.button,
+.text-link,
+.primary-nav a,
+.social-links a,
+.footer-end a {
+  transition: transform 260ms var(--motion-ease), opacity 260ms ease, background-color 260ms ease, color 260ms ease, border-color 260ms ease;
+}
+.button:hover { transform: translateY(-2px); }
+.text-link:hover,
+.social-links a:hover,
+.footer-end a:hover { opacity: .62; }
+
+/* Hero copy arrives in calm, staggered beats. */
+.motion-ready .hero-enter {
+  opacity: 0;
+  transform: translate3d(0, 20px, 0);
+  transition:
+    opacity 760ms var(--motion-ease),
+    transform 820ms var(--motion-soft);
+  transition-delay: var(--hero-delay, 0ms);
+  will-change: opacity, transform;
+}
+.motion-ready.motion-start .hero-enter {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+/* Scroll reveal system. Content is never hidden before JS opts in. */
+.motion-ready .motion-reveal {
+  opacity: 0;
+  transform: translate3d(0, 26px, 0);
+  transition:
+    opacity 720ms var(--motion-ease),
+    transform 820ms var(--motion-soft);
+  transition-delay: var(--motion-delay, 0ms);
+  will-change: opacity, transform;
+}
+.motion-ready .motion-reveal.motion-left { transform: translate3d(-28px, 0, 0); }
+.motion-ready .motion-reveal.motion-right { transform: translate3d(28px, 0, 0); }
+.motion-ready .motion-reveal.is-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+/* Image reveals stay subtle and keep existing crop/full-image rules intact. */
+.motion-ready .motion-image {
+  opacity: 0;
+  transform: translate3d(0, 18px, 0);
+  transition:
+    opacity 760ms var(--motion-ease),
+    transform 900ms var(--motion-soft);
+  transition-delay: var(--motion-delay, 0ms);
+}
+.motion-ready .motion-image.is-visible {
+  opacity: 1;
+  transform: none;
+}
+.motion-parallax { overflow: hidden; }
+.motion-parallax img {
+  --media-shift: 0px;
+  transform: scale(1.035) translate3d(0, var(--media-shift), 0);
+  transition: transform 180ms linear;
+  will-change: transform;
+}
+
+/* Existing gallery cards keep their own hover behavior, now with smoother easing. */
+.gallery-masonry img,
+.gallery-grid img {
+  transition: transform 520ms var(--motion-soft), filter 420ms ease;
+}
+.gallery-masonry figure:not(.show-full):hover img,
+.gallery-grid figure:hover img {
+  transform: scale(1.018);
+}
+
+/* Page-specific hero backgrounds get a tiny, frame-synced drift. */
+.page-home .home-hero { background-position: center calc(52% + var(--hero-shift)); }
+.page-story .page-hero { background-position: center calc(38% + var(--hero-shift)); }
+.page-menu .page-hero { background-position: center calc(54% + var(--hero-shift)); }
+.page-gallery .page-hero { background-position: center calc(52% + var(--hero-shift)); }
+.page-catering .page-hero { background-position: center calc(58% + var(--hero-shift)); }
+.page-contact .page-hero { background-position: center calc(46% + var(--hero-shift)); }
+
+/* Mobile navigation animates instead of popping open. */
+@media (max-width: 720px) {
+  .primary-nav {
+    display: flex;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translate3d(0, -8px, 0);
+    max-height: 0;
+    overflow: hidden;
+    transition:
+      opacity 240ms ease,
+      transform 320ms var(--motion-soft),
+      max-height 360ms var(--motion-soft),
+      visibility 0s linear 360ms;
+  }
+  .primary-nav.is-open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translate3d(0, 0, 0);
+    max-height: 430px;
+    transition-delay: 0s;
+  }
+  .primary-nav.is-open a {
+    animation: nav-link-in 420ms var(--motion-soft) both;
+  }
+  .primary-nav.is-open a:nth-child(2) { animation-delay: 35ms; }
+  .primary-nav.is-open a:nth-child(3) { animation-delay: 70ms; }
+  .primary-nav.is-open a:nth-child(4) { animation-delay: 105ms; }
+  .primary-nav.is-open a:nth-child(5) { animation-delay: 140ms; }
+  .primary-nav.is-open a:nth-child(6) { animation-delay: 175ms; }
+}
+
+@keyframes nav-link-in {
+  from { opacity: 0; transform: translate3d(0, 8px, 0); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Cross-document transition enhancement where supported. */
+@view-transition { navigation: auto; }
+::view-transition-old(root) { animation: page-fade-out 180ms ease both; }
+::view-transition-new(root) { animation: page-fade-in 360ms var(--motion-ease) both; }
+@keyframes page-fade-out { to { opacity: .72; } }
+@keyframes page-fade-in {
+  from { opacity: 0; transform: translate3d(0, 8px, 0); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .motion-ready .hero-enter,
+  .motion-ready .motion-reveal,
+  .motion-ready .motion-image {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .motion-parallax img {
+    transform: none !important;
+  }
+  .page-home .home-hero,
+  .page-story .page-hero,
+  .page-menu .page-hero,
+  .page-gallery .page-hero,
+  .page-catering .page-hero,
+  .page-contact .page-hero {
+    --hero-shift: 0px !important;
+  }
+  ::view-transition-old(root),
+  ::view-transition-new(root) { animation: none !important; }
+}

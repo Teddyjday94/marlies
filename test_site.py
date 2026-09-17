@@ -20,6 +20,7 @@ for name in pages:
     assert doordash in html, f'Missing DoorDash link in {name}'
     assert 'assets/images/logo.jpg' in html, f'Missing logo in {name}'
     assert 'data-nav-toggle' in html, f'Missing mobile nav in {name}'
+    assert 'app.js' in html, f'Missing shared behavior script in {name}'
     for href in re.findall(r'href="([^"]+\.html(?:#[^"]*)?)"', html):
         target = href.split('#')[0]
         assert (root / target).exists(), f'Broken internal link in {name}: {href}'
@@ -74,3 +75,13 @@ assert "background-image: url('assets/images/sign.jpg');" in css, 'Visit hero sh
 assert 'hero-visibility-v2' in css, 'Missing lighter hero overlay regression marker'
 for alpha in ['.62', '.60', '.64', '.62', '.62', '.58']:
     assert alpha in css, f'Missing expected lighter hero wash alpha {alpha}'
+
+# Regression: shared motion system remains lightweight, accessible and available on every page.
+assert 'marlies-motion-v1' in css, 'Missing shared motion CSS marker'
+assert '@media (prefers-reduced-motion: reduce)' in css, 'Missing reduced-motion CSS fallback'
+assert '@view-transition' in css, 'Missing cross-document view transition enhancement'
+assert 'IntersectionObserver' in js, 'Missing scroll reveal observer'
+assert 'requestAnimationFrame' in js, 'Missing frame-synced hero parallax/header motion'
+assert 'motion-ready' in js, 'Missing progressive motion initialization'
+assert 'is-scrolled' in js, 'Missing sticky header scroll state'
+assert '--hero-shift' in css and '--hero-shift' in js, 'Missing subtle hero background parallax'
